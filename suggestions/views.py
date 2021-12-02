@@ -9,7 +9,7 @@ from api.exceptions import *
 
 class SuggestionsEndPoint(APIView):
     def getQuerySet(self, q):
-        datos = City.objects.filter(name__icontains=q)
+        datos = City.objects.filter(name__icontains=q).order_by('-name')
         if datos.count() > 0:
             return datos
         raise ResponseError(f'No se encontró registro con valor: {q}', 404)

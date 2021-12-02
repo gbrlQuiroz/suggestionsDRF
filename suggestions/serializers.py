@@ -7,7 +7,7 @@ from haversine import haversine
 class SuggestionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = City
-        fields = '__all__'
+        fields = ['name', 'latitude', 'longitude']
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
