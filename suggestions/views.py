@@ -1,22 +1,24 @@
-from django.shortcuts import render
-from rest_framework.generics import ListAPIView
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, BooleanFilter, NumberFilter
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from .serializers import *
+from api.exceptions import *
 
 
-class SuggestionsFilter(FilterSet):
-    q = CharFilter(field_name='name', lookup_expr='icontains')
-    latitude = CharFilter(field_name='latitude', lookup_expr='icontains')
-    longitude = CharFilter(field_name='longitude', lookup_expr='icontains')
+class SuggestionsEndPoint(APIView):
+    def getQuerySet(self, q):
+        datos = City.objects.filter(name__icontains=q)
+        if datos.count() > 0:
+            return datos
+        raise ResponseError(f'No se encontró registro con valor: {q}', 404)
 
-    class Meta:
-        model = City
-        fields = ['q', 'latitude', 'longitude']
+    def get(self, request, *args, **kwargs):
+        q = self.request.query_params.get('q', None)
+        latitude = self.request.query_params.get('latitude', None)
+        longitude = self.request.query_params.get('longitude', None)
+        queryset = self.getQuerySet(q)
+        serializer = SuggestionsSerializer(queryset, many=True, context={'lat': latitude, 'lon': longitude})
 
-
-class SuggestionsFilteredListView(ListAPIView):
-    queryset = City.objects.all()
-    serializer_class = SuggestionsFilteredListSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = SuggestionsFilter
+        return Response({'suggestions': serializer.data})

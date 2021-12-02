@@ -6,6 +6,6 @@ from .views import *
 app_name = 'suggestions'
 
 urlpatterns = [
-    path('list/', SuggestionsFilteredListView.as_view(), ),
+    path('', SuggestionsEndPoint.as_view(), ),
 
 ]
