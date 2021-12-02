@@ -15,7 +15,7 @@ def configDB():
     City.objects.create(name='Amesbury', latitude=42.85842, longitude=-70.93005)
     City.objects.create(name='Amherst Center', latitude=42.37537, longitude=-72.51925)
     City.objects.create(name='Ambler', latitude=40.15455, longitude=-75.22157)
-    City.objects.create(name='Amqui', latitude=48.46382, longitude=-67.43134)
+    City.objects.create(name='Amqui', latitude=48.46382, longitude=-67.43134)  # este se modifica
     City.objects.create(name='Beaumont', latitude=53.35013, longitude=-13.41871)
     City.objects.create(name='Belleville', latitude=44.16682, longitude=-77.38277)
     City.objects.create(name='Beloeil', latitude=45.56678, longitude=-73.19915)
@@ -72,3 +72,45 @@ class PostCityError409Test(APITestCase):
         response = self.client.post('/city/create/', data=json.dumps(self.json), content_type="application/json")
         print(f'response JSON ===>>> \n {json.dumps(response.json())} \n ---')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+
+#  Probar PUT  para modificar un registro de City
+# python manage.py test city.tests.PutCityTest
+class PutCityTest(APITestCase):
+    def setUp(self):
+        configDB()
+
+        self.json = {
+            "name": "Pachuca",
+            "latitude": 333.333,
+            "longitude": 999.999
+        }
+
+    def test(self):
+
+        self.assertEqual('Amqui', City.objects.get(id=9).name)
+
+        response = self.client.put('/city/9/update/', data=json.dumps(self.json), content_type="application/json")
+        print(f'response JSON ===>>> \n {json.dumps(response.json())} \n ---')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual('Pachuca', City.objects.get(id=9).name)
+
+
+#  Probar PUT  error 404
+# python manage.py test city.tests.PutCityError404Test
+class PutCityError404Test(APITestCase):
+    def setUp(self):
+        configDB()
+
+        self.json = {
+            "name": "Pachuca",
+            "latitude": 333.333,
+            "longitude": 999.999
+        }
+
+    def test(self):
+
+        response = self.client.put('/city/369/update/', data=json.dumps(self.json), content_type="application/json")
+        print(f'response JSON ===>>> \n {json.dumps(response.json())} \n ---')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

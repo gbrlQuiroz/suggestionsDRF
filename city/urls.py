@@ -7,5 +7,6 @@ app_name = 'city'
 
 urlpatterns = [
     path('create/', CityCreateView.as_view(), ),
+    path('<pk>/update/', CityUpdateView.as_view(), ),
 
 ]

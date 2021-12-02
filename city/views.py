@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 
 from .serializers import *
 from api.exceptions import *
@@ -16,3 +16,9 @@ class CityCreateView(CreateAPIView):
                 raise ResponseError(f'Ya existe un registro con este nombre: {name}', 409)
             return self.create(request, *args, **kwargs)
         raise CamposIncorrectos(serializer.errors)
+
+
+class CityUpdateView(UpdateAPIView):
+    queryset = City.objects.filter()
+    serializer_class = CitySerializer
+    http_method_names = ['put']
